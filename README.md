@@ -21,6 +21,7 @@ O projeto utiliza as seguintes tecnologias:
 - [Spring Boot](https://spring.io/projects/spring-boot)
 - [Java Graal 17.0.7](https://www.oracle.com/java/technologies/javase/graalvm-jdk17-archive-downloads.html)
 - [Spring Data JPA](https://spring.io/projects/spring-data-jpa)
+- [Maven]
 - [Banco de dados H2]
 - [Feign]
 - [Eureka Server/CLient]
