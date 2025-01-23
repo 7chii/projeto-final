@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: cliente-service
+server:
+  port: 8000
+springdoc:
+  swagger-ui:
+    path: /swagger.html
+  api-docs:
+    path: /cliente-api-docs
+  packages-to-scan:
+    - nana.proj.client.controller
+  show-actuator: true
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka

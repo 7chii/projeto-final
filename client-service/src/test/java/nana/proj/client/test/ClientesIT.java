@@ -1,0 +1,208 @@
+package nana.proj.client.test;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.reactive.server.WebTestClient;
+
+import nana.proj.client.response.ClienteCreate;
+import nana.proj.client.response.ClienteResponse;
+import nana.proj.client.response.ErrorMessage;
+
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Sql(scripts = "../resources/sql/clientes-insert.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = "../resources/sql/clientes-delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+public class ClientesIT {
+	@Autowired
+	WebTestClient testClient;
+	@Test
+	public void createCliente_ComDadosValidos_RetornarClienteCriadoComStatus201(){
+		ClienteResponse responseBody = testClient
+				.post()
+				.uri("/cliente-service")
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON)
+				.bodyValue(new ClienteCreate("mariana pacheco cordeiro", "62983231822", true, 5000))
+				.exchange()
+				.expectStatus().isCreated()
+				.expectBody(ClienteResponse.class)
+				.returnResult().getResponseBody();
+		org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+		org.assertj.core.api.Assertions.assertThat(responseBody.getId()).isNotNull();
+		org.assertj.core.api.Assertions.assertThat(responseBody.getNome()).isEqualTo("mariana pacheco cordeiro");
+		org.assertj.core.api.Assertions.assertThat(responseBody.getTelefone()).isEqualTo("62983231822");
+		
+	}
+	@Test
+	public void createCliente_dadosInvalidos_retornarErrorMessageStatus422() {
+		ErrorMessage responseBody = testClient
+				.post()
+				.uri("/cliente-service")
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON)
+				.bodyValue(new ClienteCreate("", "", null, 5000))
+				.exchange()
+				.expectStatus().isEqualTo(422)
+				.expectBody(ErrorMessage.class)
+				.returnResult().getResponseBody();
+		org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+
+        responseBody = testClient
+				.post()
+				.uri("/cliente-service")
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON)
+				.bodyValue(new ClienteCreate("mariana pacheco", "6298323", true, 5000))
+				.exchange()
+				.expectStatus().isEqualTo(422)
+				.expectBody(ErrorMessage.class)
+				.returnResult().getResponseBody();
+		org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+
+        responseBody = testClient
+				.post()
+				.uri("/cliente-service")
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON)
+				.bodyValue(new ClienteCreate("mari", "23232322323", true, 0))
+				.exchange()
+				.expectStatus().isEqualTo(422)
+				.expectBody(ErrorMessage.class)
+				.returnResult().getResponseBody();
+		org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+
+	}
+	@Test
+	public void buscarClientePorId_retornarClienteEStatus200() {
+		ClienteResponse responseBody = testClient
+				.get()
+				.uri("/cliente-service/1")
+				.exchange()
+				.expectStatus().isOk()
+				.expectBody(ClienteResponse.class)
+				.returnResult().getResponseBody();
+		org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+		org.assertj.core.api.Assertions.assertThat(responseBody.getId()).isNotNull();
+		org.assertj.core.api.Assertions.assertThat(responseBody.getNome()).isEqualTo("maria julia da silva");
+		org.assertj.core.api.Assertions.assertThat(responseBody.getTelefone()).isEqualTo("21991840656");
+	}
+	@Test
+	public void buscarClientePorNome_retornarClienteEStatus200() {
+		ClienteResponse responseBody = testClient
+				.get()
+				.uri("/cliente-service/getByNome/maria julia da silva")
+				.exchange()
+				.expectStatus().isOk()
+				.expectBody(ClienteResponse.class)
+				.returnResult().getResponseBody();
+		org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+		org.assertj.core.api.Assertions.assertThat(responseBody.getId()).isNotNull();
+		org.assertj.core.api.Assertions.assertThat(responseBody.getNome()).isEqualTo("maria julia da silva");
+		org.assertj.core.api.Assertions.assertThat(responseBody.getTelefone()).isEqualTo("21991840656");
+	}
+	@Test
+	public void buscarClientePorId_idInexistente_retornarErrorMessageEStatus404() {
+		ErrorMessage responseBody = testClient
+				.get()
+				.uri("/cliente-service/0")
+				.exchange()
+				.expectStatus().isEqualTo(404)
+				.expectBody(ErrorMessage.class)
+				.returnResult().getResponseBody();
+		org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+		org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
+	}
+	@Test
+	public void buscarClientePorNome_nomeInexistente_retornarErrorMessageEStatus404() {
+		ErrorMessage responseBody = testClient
+				.get()
+				.uri("/cliente-service/getByNome/maripaper1111")
+				.exchange()
+				.expectStatus().isEqualTo(404)
+				.expectBody(ErrorMessage.class)
+				.returnResult().getResponseBody();
+		org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+		org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
+	}
+	@Test
+	public void atualizarClientePorIdEBody_dadosValidos_retornarStatus204() {
+		testClient
+		.patch()
+		.uri("/cliente-service/1")
+		.contentType(MediaType.APPLICATION_JSON)
+		.bodyValue(new ClienteCreate("julia maria da silva", "21991840653", true, 7000))
+		.exchange()
+		.expectStatus().isNoContent();
+	}
+	@Test
+	public void atualizarClientePorIdEBody_dadosInvalidos_retornarErrorMessageEStatus422() {
+		ErrorMessage responseBody = testClient
+				.patch()
+				.uri("/cliente-service/1")
+				.contentType(MediaType.APPLICATION_JSON)
+				.bodyValue(new ClienteCreate("", "", true, 0))
+				.exchange()
+				.expectStatus().isEqualTo(422)
+				.expectBody(ErrorMessage.class)
+				.returnResult().getResponseBody();
+		org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+        
+        responseBody = testClient
+				.patch()
+				.uri("/cliente-service/1")
+				.contentType(MediaType.APPLICATION_JSON)
+				.bodyValue(new ClienteCreate("maria", "232323", null, 0))
+				.exchange()
+				.expectStatus().isEqualTo(422)
+				.expectBody(ErrorMessage.class)
+				.returnResult().getResponseBody();
+		org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+	}
+	@Test
+	public void atualizarClientePorIdEBody_dadosValidosEIdInvalido_retornarErrorMessageEStatus404(){
+		ErrorMessage responseBody = testClient
+				.patch()
+				.uri("/cliente-service/0")
+				.contentType(MediaType.APPLICATION_JSON)
+				.bodyValue(new ClienteCreate("mariana pacheco cordeiro", "92929292929", true, 2333))
+				.exchange()
+				.expectStatus().isEqualTo(404)
+				.expectBody(ErrorMessage.class)
+				.returnResult().getResponseBody();
+		org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
+        
+	}
+	@Test
+	public void deletarClientePorId_retornarStatus200() {
+		String responseBody = testClient
+				.delete()
+				.uri("/cliente-service/1")
+				.exchange()
+				.expectStatus().isOk()
+				.expectBody(String.class)
+				.returnResult().getResponseBody();
+		org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+		org.assertj.core.api.Assertions.assertThat(responseBody).isEqualTo("entrada deletada.");
+	}
+	@Test
+	public void deletarClientePorId_invalido_retornarErrorMessageEStatus404() {
+		ErrorMessage responseBody = testClient
+				.delete()
+				.uri("/cliente-service/0")
+				.exchange()
+				.expectStatus().isNotFound()
+				.expectBody(ErrorMessage.class)
+				.returnResult().getResponseBody();
+		org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+		org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
+	}
+}

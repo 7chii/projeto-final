@@ -1,0 +1,34 @@
+spring:
+  web:
+    locale-resolver: fixed
+    locale: en_US
+  application:
+    name: db-service
+  h2:
+    console:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:dcbapp
+    driver-class-name: org.h2.Driver
+    username: root
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+  cloud:
+    config:
+      enabled: false
+  messages:
+    basename:
+    - messages
+    encoding: UTF-8
+server:
+  port: 8100
+springdoc:
+  swagger-ui:
+    path: /swagger.html
+  api-docs:
+    path: /db-api-docs
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
