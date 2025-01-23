@@ -33,25 +33,47 @@ Acesse o Swagger-ui.html do api gateway -> localhost:8765/swagger.html
 Cobertura de 100% dos endpoints.
 - Cliente-service:
   -createCliente_ComDadosValidos_RetornarClienteCriadoComStatus201() ->passou;
+  
   -createCliente_dadosInvalidos_retornarErrorMessageStatus422() ->passou;
+  
   -buscarClientePorId_retornarClienteEStatus200() ->passou;
+  
   -buscarClientePorNome_retornarClienteEStatus200() ->passou;
+  
   -buscarClientePorId_idInexistente_retornarErrorMessageEStatus404() ->passou;
+  
   -buscarClientePorId_idInexistente_retornarErrorMessageEStatus404() ->passou;
+  
   -atualizarClientePorIdEBody_dadosValidos_retornarStatus204() ->passou;
+  
   -atualizarClientePorIdEBody_dadosInvalidos_retornarErrorMessageEStatus422() ->passou;
+  
   -atualizarClientePorIdEBody_dadosValidosEIdInvalido_retornarErrorMessageEStatus404() ->passou;
+  
   -deletarClientePorId_retornarStatus200() ->passou;
+  
   -deletarClientePorId_invalido_retornarErrorMessageEStatus404() ->passou;
+  
 - Db-service:
   -createCliente_ComDadosValidos_RetornarClienteCriadoComStatus201() ->passou;
+  
   -createCliente_dadosInvalidos_retornarErrorMessageStatus422() ->passou;
+  
   -buscarClientePorId_retornarClienteEStatus200() ->passou;
+  
   -buscarClientePorNome_retornarClienteEStatus200() ->passou;
+  
   -buscarClientePorId_idInexistente_retornarErrorMessageEStatus404() ->passou;
+  
   -buscarClientePorId_idInexistente_retornarErrorMessageEStatus404() ->passou;
+  
   -atualizarClientePorIdEBody_dadosValidos_retornarStatus204() ->passou;
+  
   -atualizarClientePorIdEBody_dadosInvalidos_retornarErrorMessageEStatus422() ->passou;
+  
   -atualizarClientePorIdEBody_dadosValidosEIdInvalido_retornarErrorMessageEStatus404() ->passou;
+  
   -deletarClientePorId_retornarStatus200() ->passou;
+  
   -deletarClientePorId_invalido_retornarErrorMessageEStatus404() ->passou;
+  
